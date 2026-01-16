@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 //middleware
@@ -46,6 +46,21 @@ async function run() {
       }
     });
 
+    //get single product api
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+
+      // ObjectId validation
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ error: "Invalid product ID" });
+      }
+
+      const result = await productCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+      res.send(result);
+    });
     //product add api
     app.post("/products", async (req, res) => {
       try {
